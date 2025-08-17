@@ -1,0 +1,202 @@
+# version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: db-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DEFAULT_AUTHENTICATION_PLUGIN: mysql_native_password
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./mysql/init/01-init-company.sql:/docker-entrypoint-initdb.d/01-init-company.sql
+      - ./mysql/init/01-init-auth.sql:/docker-entrypoint-initdb.d/02-init-auth.sql
+      - ./mysql/init/03-init-oauth.sql:/docker-entrypoint-initdb.d/03-init-oauth.sql
+      - ./mysql/init/04-init-queue.sql:/docker-entrypoint-initdb.d/04-init-queue.sql
+    ports: ["3306:3306"]
+    networks: [app-network]
+
+  redis:
+    image: redis:6.2-alpine
+    container_name: redis
+    restart: unless-stopped
+    ports: ["6379:6379"]
+    networks: [app-network]
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq
+    restart: unless-stopped
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    ports: ["5672:5672", "15672:15672"]
+    networks: [app-network]
+
+  ai:
+    build:
+      context: ./ai
+      dockerfile: Dockerfile.dev
+    container_name: ai-service
+    restart: unless-stopped
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - REDIS_URL=redis://redis:6379
+    volumes:
+      - ./ai:/app
+      - /app/__pycache__
+      - /app/.pytest_cache
+    depends_on: [redis]
+    networks: [app-network]
+    ports: ["8000:8000"]
+
+  frontend:
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: frontend-app
+    restart: unless-stopped
+    environment:
+      - VITE_AUTH_SERVICE_URL=http://localhost:3001
+      - VITE_COMPANY_SERVICE_URL=http://localhost:3002
+      - VITE_API_BASE_URL=http://localhost:3002
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+      - NODE_ENV=development
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports: ["3000:3000"]
+    networks: [app-network]
+    depends_on: []
+
+  auth:
+    build: 
+      context: ./auth
+      dockerfile: Dockerfile.dev
+    container_name: auth-service
+    restart: unless-stopped
+    environment:
+      - PORT=3000
+      - NODE_ENV=${NODE_ENV:-development}
+      # Auth database connection (separate database in same container)
+      - AUTH_DB_HOST=db
+      - AUTH_DB_PORT=3306
+      - AUTH_DB_USER=${DB_USER}
+      - AUTH_DB_PASSWORD=${DB_PASSWORD}
+      - AUTH_DB_NAME=${AUTH_DB_NAME:-auth_service}
+      # JWT configuration
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_ACCESS_EXPIRES_IN=${JWT_ACCESS_EXPIRES_IN:-15m}
+      - JWT_REFRESH_EXPIRES_IN=${JWT_REFRESH_EXPIRES_IN:-7d}
+      # Service URLs for direct communication
+      - COMPANY_SERVICE_URL=http://company:3000
+      - AGENTS_SERVICE_URL=http://agents-service:3000
+      # Queue service configuration
+      - QUEUE_SERVICE_URL=http://queue-service:3005
+      # Company service gRPC connection
+      - COMPANY_GRPC_HOST=company
+      - COMPANY_GRPC_PORT=50051
+    volumes:
+      - ./auth:/app
+      - /app/node_modules
+    depends_on: [db]
+    networks: [app-network]
+    ports: ["3001:3000", "50052:50052"]
+
+  company:
+    build: 
+      context: ./company
+      dockerfile: Dockerfile.dev
+    container_name: company
+    restart: unless-stopped
+    environment:
+      - PORT=3000
+      - NODE_ENV=${NODE_ENV:-development}
+      # Company database connection (separate database in same container)
+      - DATABASE_URL=mysql://${DB_USER}:${DB_PASSWORD}@db:3306/company_service
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${COMPANY_DB_NAME:-company_service}
+      # Auth service connection for JWT validation
+      - AUTH_SERVICE_URL=http://auth-service:3000
+      # Auth service gRPC connection
+      - AUTH_GRPC_HOST=auth
+      - AUTH_GRPC_PORT=50052
+      - JWT_SECRET=${JWT_SECRET}
+      - REDIS_URL=redis://redis:6379
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      # OAuth Client Credentials for service-to-service authentication
+      - OAUTH_CLIENT_ID=company_service
+      - OAUTH_CLIENT_SECRET=company_secret_123
+      # Queue service configuration
+      - QUEUE_SERVICE_URL=http://queue-service:3005
+    volumes:
+      - ./company:/app
+      - /app/node_modules
+    depends_on: [db, redis, ai]
+    networks: [app-network]
+    ports: ["3002:3000", "50051:50051"]
+
+  queue:
+    build:
+      context: ./queue
+      dockerfile: Dockerfile.dev
+    container_name: queue-service
+    restart: unless-stopped
+    environment:
+      - PORT=3005
+      - NODE_ENV=${NODE_ENV:-development}
+      # Database configuration
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_USER=${QUEUE_DB_USER:-queue_user}
+      - DB_PASSWORD=${QUEUE_DB_PASSWORD:-queue_password123}
+      - DB_NAME=${QUEUE_DB_NAME:-queue_service}
+      # Auth service connection for token validation
+      - AUTH_SERVICE_URL=http://auth-service:3000
+      # Queue provider configuration
+      - QUEUE_PROVIDER=${QUEUE_PROVIDER:-redis}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - REDIS_DB=1
+      # RabbitMQ configuration
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USERNAME=guest
+      - RABBITMQ_PASSWORD=guest
+      - RABBITMQ_VHOST=/
+    volumes:
+      - ./queue:/app
+      - /app/node_modules
+    depends_on: [db, redis, rabbitmq]
+    networks: [app-network]
+    ports: ["3005:3005"]
+
+  notifications:
+    build: { context: ./notifications }
+    container_name: notifications-service
+    restart: unless-stopped
+    environment:
+      - PORT=3000
+      - NODE_ENV=${NODE_ENV:-development}
+      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL}
+      - SENDGRID_API_KEY=${SENDGRID_API_KEY}
+      # Queue service configuration
+      - QUEUE_SERVICE_URL=http://queue-service:3005
+    networks: [app-network]
+    ports: ["3004:3000"]
+
+volumes:
+  mysql-data:
+
+networks:
+  app-network:
+    driver: bridge

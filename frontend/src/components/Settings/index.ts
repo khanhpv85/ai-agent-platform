@@ -1,0 +1,8 @@
+export { default as Header } from './Header';
+export { default as TabNavigation } from './TabNavigation';
+export { default as ProfileTab } from './ProfileTab';
+export { default as SecurityTab } from './SecurityTab';
+export { default as NotificationsTab } from './NotificationsTab';
+export { default as AppearanceTab } from './AppearanceTab';
+export { default as IntegrationsTab } from './IntegrationsTab';
+export { default as SystemTab } from './SystemTab';

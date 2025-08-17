@@ -1,0 +1,119 @@
+# version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: db-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./mysql/init/01-init-company.sql:/docker-entrypoint-initdb.d/01-init-company.sql
+      - ./mysql/init/01-init-auth.sql:/docker-entrypoint-initdb.d/02-init-auth.sql
+    ports: ["3306:3306"]
+    networks: [app-network]
+
+  redis:
+    image: redis:6.2-alpine
+    container_name: redis
+    restart: unless-stopped
+    ports: ["6379:6379"]
+    networks: [app-network]
+
+  ai:
+    build:
+      context: ./ai
+    container_name: ai-service
+    restart: unless-stopped
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - REDIS_URL=redis://redis:6379
+    depends_on: [redis]
+    networks: [app-network]
+    ports: ["8000:8000"]
+
+  frontend:
+    build: { context: ./frontend }
+    container_name: frontend-app
+    restart: unless-stopped
+    environment:
+      - REACT_APP_AUTH_SERVICE_URL=http://localhost:3001
+      - REACT_APP_COMPANY_SERVICE_URL=http://localhost:3002
+    ports: ["3000:3000"]
+    networks: [app-network]
+
+  auth:
+    build: { context: ./auth }
+    container_name: auth-service
+    restart: unless-stopped
+    environment:
+      - PORT=3000
+      - NODE_ENV=${NODE_ENV:-development}
+      # Auth database connection (separate database in same container)
+      - AUTH_DB_HOST=db
+      - AUTH_DB_PORT=3306
+      - AUTH_DB_USER=${DB_USER}
+      - AUTH_DB_PASSWORD=${DB_PASSWORD}
+      - AUTH_DB_NAME=${AUTH_DB_NAME:-auth_service}
+      # JWT configuration
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_ACCESS_EXPIRES_IN=${JWT_ACCESS_EXPIRES_IN:-15m}
+      - JWT_REFRESH_EXPIRES_IN=${JWT_REFRESH_EXPIRES_IN:-7d}
+      # Service URLs for direct communication
+      - COMPANY_SERVICE_URL=http://company:3000
+      - AGENTS_SERVICE_URL=http://agents-service:3000
+      # Company service gRPC connection
+      - COMPANY_GRPC_HOST=company
+      - COMPANY_GRPC_PORT=50051
+    depends_on: [db]
+    networks: [app-network]
+    ports: ["3001:3000", "50052:50052"]
+
+  company:
+    build: { context: ./company }
+    container_name: company
+    restart: unless-stopped
+    environment:
+      - PORT=3000
+      - NODE_ENV=${NODE_ENV:-development}
+      # Company database connection (separate database in same container)
+      - DATABASE_URL=mysql://${DB_USER}:${DB_PASSWORD}@db:3306/company_service
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${COMPANY_DB_NAME:-company_service}
+      # Auth service connection for JWT validation
+      - AUTH_SERVICE_URL=http://auth-service:3000
+      # Auth service gRPC connection
+      - AUTH_GRPC_HOST=auth
+      - AUTH_GRPC_PORT=50052
+      - JWT_SECRET=${JWT_SECRET}
+      - REDIS_URL=redis://redis:6379
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    depends_on: [db, redis, ai]
+    networks: [app-network]
+    ports: ["3002:3000", "50051:50051"]
+
+  notifications:
+    build: { context: ./notifications }
+    container_name: notifications-service
+    restart: unless-stopped
+    environment:
+      - PORT=3000
+      - NODE_ENV=${NODE_ENV:-development}
+      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL}
+      - SENDGRID_API_KEY=${SENDGRID_API_KEY}
+    networks: [app-network]
+    ports: ["3004:3000"]
+
+volumes:
+  mysql-data:
+
+networks:
+  app-network:
+    driver: bridge

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Favicon Generator</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .canvas-container { margin: 20px 0; }
+        canvas { border: 1px solid #ccc; }
+        .instructions { background: #f5f5f5; padding: 15px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>AI Agent Platform Favicon Generator</h1>
+    
+    <div class="instructions">
+        <h3>Instructions:</h3>
+        <ol>
+            <li>Right-click on the canvas below</li>
+            <li>Select "Save image as..."</li>
+            <li>Save as "favicon.ico"</li>
+            <li>Replace the existing favicon.ico file</li>
+        </ol>
+    </div>
+    
+    <div class="canvas-container">
+        <canvas id="faviconCanvas" width="32" height="32"></canvas>
+    </div>
+    
+    <script>
+        const canvas = document.getElementById('faviconCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Create AI-themed favicon
+        function drawFavicon() {
+            // Background
+            ctx.fillStyle = '#6366f1';
+            ctx.fillRect(0, 0, 32, 32);
+            
+            // Border
+            ctx.strokeStyle = '#4f46e5';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(1, 1, 30, 30);
+            
+            // AI/Neural network nodes
+            ctx.fillStyle = '#ffffff';
+            
+            // Corner nodes
+            ctx.beginPath();
+            ctx.arc(8, 8, 2, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.arc(24, 8, 2, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.arc(8, 24, 2, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.arc(24, 24, 2, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Center node
+            ctx.beginPath();
+            ctx.arc(16, 16, 2, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Connections
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 1.5;
+            
+            // Lines to center
+            ctx.beginPath();
+            ctx.moveTo(8, 8);
+            ctx.lineTo(16, 16);
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.moveTo(24, 8);
+            ctx.lineTo(16, 16);
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.moveTo(8, 24);
+            ctx.lineTo(16, 16);
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.moveTo(24, 24);
+            ctx.lineTo(16, 16);
+            ctx.stroke();
+            
+            // Central AI indicator (dashed circle)
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([2, 2]);
+            ctx.beginPath();
+            ctx.arc(16, 16, 6, 0, 2 * Math.PI);
+            ctx.stroke();
+        }
+        
+        drawFavicon();
+    </script>
+</body>
+</html>

@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Agent Platform - API Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .note {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            border: 1px solid #f39c12;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .note strong {
+            color: #e67e22;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .service-card {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #3498db, #2980b9);
+        }
+
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            border-color: #3498db;
+        }
+
+        .service-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .service-icon {
+            font-size: 2rem;
+            margin-right: 15px;
+            width: 50px;
+            text-align: center;
+        }
+
+        .service-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0;
+        }
+
+        .service-details {
+            margin-bottom: 20px;
+        }
+
+        .service-detail {
+            margin: 8px 0;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .service-detail strong {
+            color: #2c3e50;
+        }
+
+        .service-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #2980b9, #1f5f8b);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #ecf0f1;
+            color: #2c3e50;
+            border: 1px solid #bdc3c7;
+        }
+
+        .btn-secondary:hover {
+            background: #d5dbdb;
+            transform: translateY(-2px);
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 30px 40px;
+            text-align: center;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .footer p {
+            color: #666;
+            margin: 5px 0;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #27ae60;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 AI Agent Platform</h1>
+            <p>Comprehensive API Documentation Hub</p>
+        </div>
+
+        <div class="content">
+            <div class="note">
+                <strong>📋 Important:</strong> All services are accessed through the API Gateway. 
+                Individual service documentation is provided for development and debugging purposes.
+                <br><br>
+                <span class="status-indicator"></span>
+                <strong>Production API Base URL:</strong> <code>http://localhost/api/</code>
+            </div>
+
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-header">
+                        <div class="service-icon">🔐</div>
+                        <h3 class="service-title">Authentication Service</h3>
+                    </div>
+                    <div class="service-details">
+                        <div class="service-detail">
+                            <strong>Gateway Route:</strong> /api/auth/
+                        </div>
+                        <div class="service-detail">
+                            <strong>Description:</strong> Complete authentication system with enhanced security
+                        </div>
+                        <div class="service-detail">
+                            <strong>Features:</strong> JWT tokens, refresh tokens, session management, password reset, email verification, account locking
+                        </div>
+                        <div class="service-detail">
+                            <strong>Key Endpoints:</strong> /login, /register, /refresh-token, /me, /sessions, /forgot-password
+                        </div>
+                    </div>
+                    <div class="service-actions">
+                        <a href="/docs/auth/" target="_blank" class="btn btn-primary">View Documentation</a>
+                        <a href="http://localhost:3001/docs" target="_blank" class="btn btn-secondary">Direct Access</a>
+                    </div>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-header">
+                        <div class="service-icon">🏢</div>
+                        <h3 class="service-title">Company Service</h3>
+                    </div>
+                    <div class="service-details">
+                        <div class="service-detail">
+                            <strong>Gateway Route:</strong> /api/company/
+                        </div>
+                        <div class="service-detail">
+                            <strong>Description:</strong> Multi-tenant company management with workflow engine
+                        </div>
+                        <div class="service-detail">
+                            <strong>Features:</strong> Multi-tenant, workflow engine, integrations, user management
+                        </div>
+                        <div class="service-detail">
+                            <strong>Key Endpoints:</strong> /companies, /workflows, /integrations, /users
+                        </div>
+                    </div>
+                    <div class="service-actions">
+                        <a href="/docs/company/" target="_blank" class="btn btn-primary">View Documentation</a>
+                        <a href="http://localhost:3002/docs" target="_blank" class="btn btn-secondary">Direct Access</a>
+                    </div>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-header">
+                        <div class="service-icon">🤖</div>
+                        <h3 class="service-title">Agents Service</h3>
+                    </div>
+                    <div class="service-details">
+                        <div class="service-detail">
+                            <strong>Gateway Route:</strong> /api/agents/
+                        </div>
+                        <div class="service-detail">
+                            <strong>Description:</strong> AI agent lifecycle management and configuration
+                        </div>
+                        <div class="service-detail">
+                            <strong>Features:</strong> Agent lifecycle, configuration, monitoring, testing
+                        </div>
+                        <div class="service-detail">
+                            <strong>Key Endpoints:</strong> /agents, /configure, /status, /test
+                        </div>
+                    </div>
+                    <div class="service-actions">
+                        <a href="/docs/agents/" target="_blank" class="btn btn-primary">View Documentation</a>
+                        <a href="http://localhost:3003/docs" target="_blank" class="btn btn-secondary">Direct Access</a>
+                    </div>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-header">
+                        <div class="service-icon">📢</div>
+                        <h3 class="service-title">Notifications Service</h3>
+                    </div>
+                    <div class="service-details">
+                        <div class="service-detail">
+                            <strong>Gateway Route:</strong> /api/notifications/
+                        </div>
+                        <div class="service-detail">
+                            <strong>Description:</strong> Multi-channel notification and messaging system
+                        </div>
+                        <div class="service-detail">
+                            <strong>Features:</strong> Email, Slack, SMS, webhooks, templates, history
+                        </div>
+                        <div class="service-detail">
+                            <strong>Key Endpoints:</strong> /send, /templates, /history, /health
+                        </div>
+                    </div>
+                    <div class="service-actions">
+                        <a href="/docs/notifications/" target="_blank" class="btn btn-primary">View Documentation</a>
+                        <a href="http://localhost:3004/docs" target="_blank" class="btn btn-secondary">Direct Access</a>
+                    </div>
+                </div>
+
+                <div class="service-card">
+                    <div class="service-header">
+                        <div class="service-icon">🧠</div>
+                        <h3 class="service-title">AI Service</h3>
+                    </div>
+                    <div class="service-details">
+                        <div class="service-detail">
+                            <strong>Gateway Route:</strong> /api/ai/
+                        </div>
+                        <div class="service-detail">
+                            <strong>Description:</strong> Multi-provider AI operations and reasoning engine
+                        </div>
+                        <div class="service-detail">
+                            <strong>Features:</strong> Multi-provider (OpenAI, Google, Anthropic), caching, logging, embeddings
+                        </div>
+                        <div class="service-detail">
+                            <strong>Key Endpoints:</strong> /summarize, /chat, /generate, /embed, /models, /health
+                        </div>
+                    </div>
+                    <div class="service-actions">
+                        <a href="/docs/ai/" target="_blank" class="btn btn-primary">View Documentation</a>
+                        <a href="http://localhost:8000/docs" target="_blank" class="btn btn-secondary">Direct Access</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>🔗 API Gateway:</strong> All production API calls should use the gateway routes starting with /api/</p>
+            <p><strong>🔐 Authentication:</strong> Enhanced with refresh tokens, session management, and security features</p>
+            <p><strong>📚 Development:</strong> Individual service documentation is available for development and debugging</p>
+            <p><strong>🚀 Status:</strong> All services are running and accessible through the gateway</p>
+        </div>
+    </div>
+
+    <script>
+        // Add some interactivity
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add click tracking for analytics
+            const links = document.querySelectorAll('a');
+            links.forEach(link => {
+                link.addEventListener('click', function() {
+                    console.log('Documentation accessed:', this.href);
+                });
+            });
+
+            // Add service status checking
+            const services = [
+                { name: 'auth', url: 'http://localhost:3001/health' },
+                { name: 'company', url: 'http://localhost:3002/health' },
+                { name: 'agents', url: 'http://localhost:3003/health' },
+                { name: 'notifications', url: 'http://localhost:3004/health' },
+                { name: 'ai', url: 'http://localhost:8000/health' }
+            ];
+
+            // Check service health (optional)
+            services.forEach(service => {
+                fetch(service.url)
+                    .then(response => {
+                        if (response.ok) {
+                            console.log(`${service.name} service is healthy`);
+                        }
+                    })
+                    .catch(error => {
+                        console.log(`${service.name} service health check failed:`, error);
+                    });
+            });
+        });
+    </script>
+</body>
+</html>

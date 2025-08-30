@@ -7,3 +7,6 @@ export { Toast, toastVariants } from './Toast';
 export { default as ComingSoon } from './ComingSoon';
 export { default as Select } from './Select';
 export type { SelectOption, SelectProps } from './Select';
+export { default as NoDefaultCompanyWarning } from './NoDefaultCompanyWarning';
+export { Modal } from './Modal';
+export { ScrollableTable } from './ScrollableTable';

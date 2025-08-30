@@ -3,10 +3,11 @@ import { Button } from '@components/UI';
 import { Plus } from 'lucide-react';
 
 interface HeaderProps {
+  onCreateClick: () => void;
   className?: string;
 }
 
-const Header: React.FC<HeaderProps> = ({ className = '' }) => {
+const Header: React.FC<HeaderProps> = ({ onCreateClick, className = '' }) => {
   return (
     <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between ${className}`}>
       <div>
@@ -15,7 +16,11 @@ const Header: React.FC<HeaderProps> = ({ className = '' }) => {
           Manage your AI agents and their configurations
         </p>
       </div>
-      <Button className="mt-4 sm:mt-0" leftIcon={<Plus className="h-4 w-4" />}>
+      <Button 
+        className="mt-4 sm:mt-0" 
+        leftIcon={<Plus className="h-4 w-4" />}
+        onClick={onCreateClick}
+      >
         Create Agent
       </Button>
     </div>

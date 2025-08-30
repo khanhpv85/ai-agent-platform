@@ -16,6 +16,9 @@ services:
       - ./mysql/init/01-init-auth.sql:/docker-entrypoint-initdb.d/02-init-auth.sql
       - ./mysql/init/03-init-oauth.sql:/docker-entrypoint-initdb.d/03-init-oauth.sql
       - ./mysql/init/04-init-queue.sql:/docker-entrypoint-initdb.d/04-init-queue.sql
+      - ./mysql/init/05-migrate-workflows.sql:/docker-entrypoint-initdb.d/05-migrate-workflows.sql
+      - ./mysql/init/06-create-knowledge-bases.sql:/docker-entrypoint-initdb.d/06-create-knowledge-bases.sql
+      - ./mysql/init/07-create-api-keys.sql:/docker-entrypoint-initdb.d/07-create-api-keys.sql
     ports: ["3306:3306"]
     networks: [app-network]
 
@@ -193,6 +196,22 @@ services:
       - QUEUE_SERVICE_URL=http://queue-service:3005
     networks: [app-network]
     ports: ["3004:3000"]
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    restart: unless-stopped
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - INTERNAL_API_BASE=http://company:3000
+      - AI_SERVICE_URL=http://ai-service:8000
+    volumes:
+      - ./api-gateway:/app
+    depends_on: [company, ai, redis]
+    networks: [app-network]
+    ports: ["8080:8080"]
 
 volumes:
   mysql-data:

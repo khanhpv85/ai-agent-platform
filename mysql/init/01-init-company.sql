@@ -34,6 +34,7 @@ CREATE TABLE IF NOT EXISTS user_companies (
     user_id VARCHAR(36) NOT NULL,
     company_id VARCHAR(36) NOT NULL,
     role ENUM('owner', 'admin', 'member') DEFAULT 'member',
+    is_default BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES user_profiles(id) ON DELETE CASCADE,
     FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE,
@@ -56,19 +57,19 @@ CREATE TABLE IF NOT EXISTS agents (
     FOREIGN KEY (created_by) REFERENCES user_profiles(id) ON DELETE CASCADE
 );
 
--- Workflows table
+-- Workflows table (Updated: Removed agent_id, added company_id for direct company association)
 CREATE TABLE IF NOT EXISTS workflows (
     id VARCHAR(36) PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     description TEXT,
-    agent_id VARCHAR(36) NOT NULL,
+    company_id VARCHAR(36) NOT NULL,
     created_by VARCHAR(36) NOT NULL,
     status ENUM('active', 'inactive', 'draft') DEFAULT 'draft',
     steps JSON NOT NULL,
     triggers JSON,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (agent_id) REFERENCES agents(id) ON DELETE CASCADE,
+    FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE,
     FOREIGN KEY (created_by) REFERENCES user_profiles(id) ON DELETE CASCADE
 );
 
@@ -156,7 +157,7 @@ CREATE TABLE IF NOT EXISTS ai_service_logs (
 CREATE INDEX idx_user_profiles_email ON user_profiles(email);
 CREATE INDEX idx_user_profiles_company ON user_companies(company_id);
 CREATE INDEX idx_agents_company ON agents(company_id);
-CREATE INDEX idx_workflows_agent ON workflows(agent_id);
+CREATE INDEX idx_workflows_company ON workflows(company_id);
 CREATE INDEX idx_executions_workflow ON workflow_executions(workflow_id);
 CREATE INDEX idx_executions_status ON workflow_executions(status);
 CREATE INDEX idx_notifications_user ON notifications(user_id);

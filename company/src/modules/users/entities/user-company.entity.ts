@@ -21,6 +21,9 @@ export class UserCompany {
   })
   role: CompanyRole;
 
+  @Column('boolean', { default: false })
+  is_default: boolean;
+
   @CreateDateColumn()
   created_at: Date;
 

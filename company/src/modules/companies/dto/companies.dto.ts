@@ -1,6 +1,7 @@
-import { IsString, IsOptional, IsEnum, IsInt, Min, MaxLength } from 'class-validator';
+import { IsString, IsOptional, IsEnum, IsInt, Min, MaxLength, IsPositive } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { SubscriptionPlan } from '../../../types/company.types';
+import { Type } from 'class-transformer';
+import { SubscriptionPlan } from '@types';
 
 export class CreateCompanyDto {
   @ApiProperty({ example: 'My Company' })
@@ -49,4 +50,21 @@ export class UpdateCompanyDto {
   @IsInt()
   @Min(1)
   max_agents?: number;
+}
+
+export class GetUserCompaniesQueryDto {
+  @ApiProperty({ example: 1, description: 'Page number', required: false, default: 1 })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @IsPositive()
+  page?: number = 1;
+
+  @ApiProperty({ example: 10, description: 'Number of items per page', required: false, default: 10 })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @IsPositive()
+  @Min(1)
+  limit?: number = 10;
 }

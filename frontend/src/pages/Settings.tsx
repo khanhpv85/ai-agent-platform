@@ -8,7 +8,8 @@ import {
   NotificationsTab, 
   AppearanceTab, 
   IntegrationsTab, 
-  SystemTab 
+  SystemTab,
+  ApiKeyManagement
 } from '@components/Settings';
 import { SettingsTab } from '@types';
 
@@ -19,7 +20,7 @@ const Settings: React.FC = () => {
   // Get initial tab from URL hash or default to 'profile'
   const getInitialTab = (): SettingsTab => {
     const hash = location.hash.replace('#', '');
-    const validTabs: SettingsTab[] = ['profile', 'security', 'notifications', 'appearance', 'integrations', 'system'];
+    const validTabs: SettingsTab[] = ['profile', 'security', 'notifications', 'appearance', 'integrations', 'api-keys', 'system'];
     return validTabs.includes(hash as SettingsTab) ? (hash as SettingsTab) : 'profile';
   };
 
@@ -56,6 +57,8 @@ const Settings: React.FC = () => {
         return <AppearanceTab />;
       case 'integrations':
         return <IntegrationsTab />;
+      case 'api-keys':
+        return <ApiKeyManagement />;
       case 'system':
         return <SystemTab />;
       default:

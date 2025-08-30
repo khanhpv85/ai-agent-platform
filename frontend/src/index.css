@@ -29,6 +29,143 @@
     @apply bg-gray-400;
   }
 
+  /* Table scrollbar styles */
+  .table-scrollbar::-webkit-scrollbar {
+    @apply w-2;
+  }
+
+  .table-scrollbar::-webkit-scrollbar-track {
+    @apply bg-gray-50 rounded-full;
+  }
+
+  .table-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 rounded-full;
+  }
+
+  .table-scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-400;
+  }
+
+  /* Horizontal table scrollbar styles */
+  .overflow-x-auto::-webkit-scrollbar {
+    @apply h-3;
+  }
+
+  .overflow-x-auto::-webkit-scrollbar-track {
+    @apply bg-gray-100 rounded-full;
+  }
+
+  .overflow-x-auto::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 rounded-full;
+  }
+
+  .overflow-x-auto::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-400;
+  }
+
+  /* Force horizontal scrollbar visibility */
+  .overflow-x-auto {
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    scrollbar-width: thin !important;
+    -webkit-overflow-scrolling: touch;
+    max-width: 100% !important;
+    position: relative !important;
+  }
+
+  /* Ensure horizontal scrollbar is visible */
+  .overflow-x-auto::-webkit-scrollbar {
+    height: 8px !important;
+    width: auto !important;
+  }
+
+  .overflow-x-auto::-webkit-scrollbar-track {
+    background: #f8fafc !important;
+    border-radius: 4px !important;
+  }
+
+  .overflow-x-auto::-webkit-scrollbar-thumb {
+    background: #cbd5e1 !important;
+    border-radius: 4px !important;
+    border: 1px solid #f8fafc !important;
+  }
+
+  .overflow-x-auto::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8 !important;
+  }
+
+  /* Table specific scrollbar */
+  table {
+    min-width: 1000px !important;
+    max-width: none !important;
+  }
+
+  /* Prevent page-level horizontal scroll */
+  body {
+    overflow-x: hidden !important;
+  }
+
+  html {
+    overflow-x: hidden !important;
+  }
+
+  /* Table wrapper to prevent layout issues */
+  .table-wrapper {
+    width: 100%;
+    max-width: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Responsive table container */
+  .table-container {
+    width: 100%;
+    position: relative;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  /* Ensure table fits within container */
+  .table-container table {
+    width: 100%;
+    min-width: 100%;
+  }
+
+  /* Better table column widths */
+  .table-fixed {
+    table-layout: fixed;
+  }
+
+  .table-auto {
+    table-layout: auto;
+  }
+
+  /* Firefox scrollbar styles */
+  .table-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(209 213 219) rgb(249 250 251);
+  }
+
+  .overflow-x-auto {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(209 213 219) rgb(243 244 246);
+  }
+
+  /* Smooth scrolling for table containers */
+  .table-scrollbar {
+    scroll-behavior: smooth;
+  }
+
+  /* Table row hover effects */
+  .table-scrollbar tbody tr:hover {
+    @apply bg-gray-50;
+  }
+
+  /* Sticky header shadow effect */
+  .sticky.top-0 {
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+  }
+
   /* Focus styles */
   *:focus-visible {
     @apply outline-none ring-2 ring-primary-500 ring-offset-2;

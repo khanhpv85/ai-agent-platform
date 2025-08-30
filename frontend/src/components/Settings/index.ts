@@ -6,3 +6,4 @@ export { default as NotificationsTab } from './NotificationsTab';
 export { default as AppearanceTab } from './AppearanceTab';
 export { default as IntegrationsTab } from './IntegrationsTab';
 export { default as SystemTab } from './SystemTab';
+export { default as ApiKeyManagement } from './ApiKeyManagement';

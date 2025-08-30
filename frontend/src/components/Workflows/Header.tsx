@@ -15,9 +15,9 @@ const Header: React.FC<HeaderProps> = ({ className = '' }) => {
           Manage your automation workflows and processes
         </p>
       </div>
-      <Button className="mt-4 sm:mt-0" leftIcon={<Plus className="h-4 w-4" />}>
+      {/* <Button className="mt-4 sm:mt-0" leftIcon={<Plus className="h-4 w-4" />}>
         Create Workflow
-      </Button>
+      </Button> */}
     </div>
   );
 };

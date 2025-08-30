@@ -2,16 +2,11 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { User } from '@modules/users/entities/user.entity';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
     private configService: ConfigService,
-    @InjectRepository(User)
-    private userRepository: Repository<User>,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -21,20 +16,14 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: any) {
-    const user = await this.userRepository.findOne({
-      where: { id: payload.sub },
-    });
-
-    if (!user || !user.is_active) {
-      throw new UnauthorizedException('User not found or inactive');
-    }
-
+    // Simply return the payload from the JWT token
+    // The token is already validated by the JWT library
     return {
-      id: user.id,
-      email: user.email,
-      role: user.role,
-      first_name: user.first_name,
-      last_name: user.last_name,
+      id: payload.sub,
+      email: payload.email,
+      role: payload.role,
+      first_name: payload.first_name,
+      last_name: payload.last_name,
     };
   }
 }

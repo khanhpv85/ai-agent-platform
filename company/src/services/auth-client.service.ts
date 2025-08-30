@@ -46,7 +46,16 @@ export class AuthClientService {
       });
 
       if (response.data.success && response.data.valid) {
-        return response.data.user_info;
+        const userInfo = response.data.user_info;
+        // Map user_id to id to match AuthUser interface
+        return {
+          id: userInfo.user_id,
+          email: userInfo.email,
+          first_name: userInfo.first_name,
+          last_name: userInfo.last_name,
+          role: userInfo.role,
+          is_active: userInfo.is_active,
+        };
       } else {
         throw new UnauthorizedException('Invalid token');
       }

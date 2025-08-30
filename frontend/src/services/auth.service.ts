@@ -13,7 +13,11 @@ import {
   ResendVerificationRequest,
   ChangePasswordRequest,
   UpdateProfileRequest,
-  SessionsResponse
+  SessionsResponse,
+  CreateUserRequest,
+  UpdateUserRequest,
+  UsersResponse,
+  User
 } from '../interfaces/auth.interface';
 import { 
   setUser, 
@@ -113,6 +117,49 @@ export const authAPI = {
 
   revokeAllSessions: async () => {
     await authClient.delete('/auth/sessions');
+  },
+
+  // User management functions
+  getUsers: async (params?: { page?: number; limit?: number; search?: string; role?: string; company_id?: string }): Promise<UsersResponse> => {
+    const response = await authClient.get('/auth/users', { params });
+    return response.data;
+  },
+
+  getUserById: async (userId: string): Promise<User> => {
+    const response = await authClient.get(`/auth/users/${userId}`);
+    return response.data;
+  },
+
+  createUser: async (userData: CreateUserRequest): Promise<User> => {
+    const response = await authClient.post('/auth/users', userData);
+    return response.data;
+  },
+
+  updateUser: async (userId: string, userData: UpdateUserRequest): Promise<User> => {
+    const response = await authClient.put(`/auth/users/${userId}`, userData);
+    return response.data;
+  },
+
+  deleteUser: async (userId: string): Promise<void> => {
+    await authClient.delete(`/auth/users/${userId}`);
+  },
+
+  activateUser: async (userId: string): Promise<User> => {
+    const response = await authClient.patch(`/auth/users/${userId}/activate`);
+    return response.data;
+  },
+
+  deactivateUser: async (userId: string): Promise<User> => {
+    const response = await authClient.patch(`/auth/users/${userId}/deactivate`);
+    return response.data;
+  },
+
+  resendUserVerification: async (userId: string): Promise<void> => {
+    await authClient.post(`/auth/users/${userId}/resend-verification`);
+  },
+
+  resetUserPassword: async (userId: string): Promise<void> => {
+    await authClient.post(`/auth/users/${userId}/reset-password`);
   },
 };
 
@@ -440,6 +487,187 @@ export const revokeAllSessions = createAsyncThunk(
       return true;
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || 'Failed to revoke all sessions';
+      dispatch(setAuthError(errorMessage));
+      return rejectWithValue(errorMessage);
+    } finally {
+      dispatch(setAuthLoading(false));
+    }
+  }
+);
+
+// User management async thunks
+export const fetchUsers = createAsyncThunk(
+  'auth/fetchUsers',
+  async (params?: { page?: number; limit?: number; search?: string; role?: string; company_id?: string }, { dispatch, rejectWithValue }: any) => {
+    try {
+      dispatch(setAuthLoading(true));
+      dispatch(clearAuthError());
+      
+      const response = await authAPI.getUsers(params);
+      
+      return response;
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || 'Failed to fetch users';
+      dispatch(setAuthError(errorMessage));
+      return rejectWithValue(errorMessage);
+    } finally {
+      dispatch(setAuthLoading(false));
+    }
+  }
+);
+
+export const fetchUserById = createAsyncThunk(
+  'auth/fetchUserById',
+  async (userId: string, { dispatch, rejectWithValue }: any) => {
+    try {
+      dispatch(setAuthLoading(true));
+      dispatch(clearAuthError());
+      
+      const response = await authAPI.getUserById(userId);
+      
+      return response;
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || 'Failed to fetch user';
+      dispatch(setAuthError(errorMessage));
+      return rejectWithValue(errorMessage);
+    } finally {
+      dispatch(setAuthLoading(false));
+    }
+  }
+);
+
+export const createUser = createAsyncThunk(
+  'auth/createUser',
+  async (userData: CreateUserRequest, { dispatch, rejectWithValue }: any) => {
+    try {
+      dispatch(setAuthLoading(true));
+      dispatch(clearAuthError());
+      
+      const response = await authAPI.createUser(userData);
+      
+      return response;
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || 'Failed to create user';
+      dispatch(setAuthError(errorMessage));
+      return rejectWithValue(errorMessage);
+    } finally {
+      dispatch(setAuthLoading(false));
+    }
+  }
+);
+
+export const updateUser = createAsyncThunk(
+  'auth/updateUser',
+  async ({ userId, userData }: { userId: string; userData: UpdateUserRequest }, { dispatch, rejectWithValue }: any) => {
+    try {
+      dispatch(setAuthLoading(true));
+      dispatch(clearAuthError());
+      
+      const response = await authAPI.updateUser(userId, userData);
+      
+      return response;
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || 'Failed to update user';
+      dispatch(setAuthError(errorMessage));
+      return rejectWithValue(errorMessage);
+    } finally {
+      dispatch(setAuthLoading(false));
+    }
+  }
+);
+
+export const deleteUser = createAsyncThunk(
+  'auth/deleteUser',
+  async (userId: string, { dispatch, rejectWithValue }: any) => {
+    try {
+      dispatch(setAuthLoading(true));
+      dispatch(clearAuthError());
+      
+      await authAPI.deleteUser(userId);
+      
+      return userId;
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || 'Failed to delete user';
+      dispatch(setAuthError(errorMessage));
+      return rejectWithValue(errorMessage);
+    } finally {
+      dispatch(setAuthLoading(false));
+    }
+  }
+);
+
+export const activateUser = createAsyncThunk(
+  'auth/activateUser',
+  async (userId: string, { dispatch, rejectWithValue }: any) => {
+    try {
+      dispatch(setAuthLoading(true));
+      dispatch(clearAuthError());
+      
+      const response = await authAPI.activateUser(userId);
+      
+      return response;
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || 'Failed to activate user';
+      dispatch(setAuthError(errorMessage));
+      return rejectWithValue(errorMessage);
+    } finally {
+      dispatch(setAuthLoading(false));
+    }
+  }
+);
+
+export const deactivateUser = createAsyncThunk(
+  'auth/deactivateUser',
+  async (userId: string, { dispatch, rejectWithValue }: any) => {
+    try {
+      dispatch(setAuthLoading(true));
+      dispatch(clearAuthError());
+      
+      const response = await authAPI.deactivateUser(userId);
+      
+      return response;
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || 'Failed to deactivate user';
+      dispatch(setAuthError(errorMessage));
+      return rejectWithValue(errorMessage);
+    } finally {
+      dispatch(setAuthLoading(false));
+    }
+  }
+);
+
+export const resendUserVerification = createAsyncThunk(
+  'auth/resendUserVerification',
+  async (userId: string, { dispatch, rejectWithValue }: any) => {
+    try {
+      dispatch(setAuthLoading(true));
+      dispatch(clearAuthError());
+      
+      await authAPI.resendUserVerification(userId);
+      
+      return userId;
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || 'Failed to resend verification';
+      dispatch(setAuthError(errorMessage));
+      return rejectWithValue(errorMessage);
+    } finally {
+      dispatch(setAuthLoading(false));
+    }
+  }
+);
+
+export const resetUserPassword = createAsyncThunk(
+  'auth/resetUserPassword',
+  async (userId: string, { dispatch, rejectWithValue }: any) => {
+    try {
+      dispatch(setAuthLoading(true));
+      dispatch(clearAuthError());
+      
+      await authAPI.resetUserPassword(userId);
+      
+      return userId;
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || 'Failed to reset password';
       dispatch(setAuthError(errorMessage));
       return rejectWithValue(errorMessage);
     } finally {

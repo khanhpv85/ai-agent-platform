@@ -2,7 +2,7 @@
  * Settings-related types and interfaces
  */
 
-export type SettingsTab = 'profile' | 'security' | 'notifications' | 'appearance' | 'integrations' | 'system';
+export type SettingsTab = 'profile' | 'security' | 'notifications' | 'appearance' | 'integrations' | 'system' | 'api-keys';
 
 export interface SettingsTabConfig {
   id: SettingsTab;

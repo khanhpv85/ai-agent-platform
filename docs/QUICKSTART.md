@@ -1,306 +1,277 @@
-# Quick Start Guide
+# 🚀 AI Agent Platform - Quick Start Guide
 
-Get up and running with the AI Agent Platform in minutes!
+Welcome to the AI Agent Platform! This guide will help you get started with our AI PaaS platform for building intelligent applications with autonomous agents and workflows.
 
-## 🚀 Prerequisites
+## 📋 Prerequisites
 
-- **Docker & Docker Compose** (latest version)
-- **Git** (for cloning the repository)
-- **Text Editor** (VS Code recommended)
+- Node.js 18+ or Python 3.8+
+- An API key from the AI Agent Platform dashboard
+- Basic knowledge of JavaScript/TypeScript or Python
 
-## ⚡ Quick Setup
+## 🔑 Getting Your API Key
 
-### 1. Clone the Repository
+1. **Sign up** at [https://aiagentplatform.com](https://aiagentplatform.com)
+2. **Create a company** in your dashboard
+3. **Generate an API key** in the API Keys section
+4. **Copy your API key** - you'll need it for authentication
+
+## 🛠️ Installation
+
+### JavaScript/TypeScript
+
 ```bash
-git clone <repository-url>
-cd ai-agent-platform
+npm install @aiagentplatform/sdk
 ```
 
-### 2. Configure Environment
+### Python
+
 ```bash
-# Copy environment template
-cp env.example .env
-
-# Edit .env file with your settings
-# At minimum, update these values:
-# - DB_ROOT_PASSWORD (choose a secure password)
-# - JWT_SECRET (generate a random string)
-# - OPENAI_API_KEY (get from OpenAI)
+pip install aiagentplatform
 ```
 
-### 3. Start the Platform
-```bash
-# Run the setup script
-./scripts/setup.sh
+## 🚀 Quick Start Examples
 
-# Or manually:
-docker-compose up -d
+### 1. Chat with AI
+
+#### JavaScript/TypeScript
+
+```typescript
+import AIAgentPlatform from '@aiagentplatform/sdk';
+
+const client = new AIAgentPlatform({
+  apiKey: 'your-api-key-here',
+  company_id: 'your-company-id'
+});
+
+// Simple chat
+const response = await client.chat({
+  messages: [
+    { role: 'user', content: 'Hello! How can you help me today?' }
+  ],
+  model: 'gpt-3.5-turbo',
+  company_id: 'your-company-id'
+});
+
+console.log(response.data.choices[0].message.content);
 ```
 
-### 4. Access the Platform
-- **Frontend**: http://localhost:3000
-- **API Gateway**: http://localhost:80
-- **Auth Service Docs**: http://localhost:3000/docs
-- **AI Service Docs**: http://localhost:8000/docs
+#### Python
 
-## 🎯 First Steps
+```python
+from aiagentplatform import AIAgentPlatform
 
-### 1. Create Your Account
-1. Navigate to http://localhost:3000
-2. Click "Register" to create a new account
-3. Fill in your details and company information
-4. Verify your email (if configured)
+client = AIAgentPlatform(
+    api_key="your-api-key-here",
+    company_id="your-company-id"
+)
 
-### 2. Create Your First Agent
-1. Log in to the platform
-2. Navigate to "Agents" in the sidebar
-3. Click "Create New Agent"
-4. Define your agent's purpose and capabilities
-5. Save the agent
+response = client.chat(
+    messages=[
+        {"role": "user", "content": "Hello! How can you help me today?"}
+    ],
+    model="gpt-3.5-turbo"
+)
 
-### 3. Build Your First Workflow
-1. Select your agent
-2. Click "Workflows" tab
-3. Use the visual workflow builder
-4. Add steps like:
-   - **AI Reasoning**: Process data with AI
-   - **API Call**: Connect to external services
-   - **Condition**: Add decision logic
-   - **Notification**: Send alerts
-
-### 4. Deploy and Monitor
-1. Activate your workflow
-2. Monitor execution in real-time
-3. View logs and performance metrics
-4. Iterate and improve
-
-## 🔧 Configuration Options
-
-### AI Service Configuration
-```env
-# OpenAI (recommended for beginners)
-OPENAI_API_KEY=your-openai-api-key
-
-# Google Gemini (alternative)
-GOOGLE_API_KEY=your-google-api-key
-
-# Anthropic Claude (alternative)
-ANTHROPIC_API_KEY=your-anthropic-api-key
+print(response.data.choices[0].message.content)
 ```
 
-### External Integrations
-```env
-# Email notifications (SendGrid)
-SENDGRID_API_KEY=your-sendgrid-api-key
+### 2. Streaming Chat
 
-# Slack notifications
-SLACK_WEBHOOK_URL=your-slack-webhook-url
+#### JavaScript/TypeScript
+
+```typescript
+// Streaming chat
+const stream = client.chatStream({
+  messages: [
+    { role: 'user', content: 'Tell me a story about a robot.' }
+  ],
+  model: 'gpt-3.5-turbo',
+  company_id: 'your-company-id'
+});
+
+for await (const chunk of stream) {
+  process.stdout.write(chunk);
+}
 ```
 
-### Database Configuration
-```env
-# Database settings (defaults work for most cases)
-DB_ROOT_PASSWORD=your-secure-password
-DB_NAME=ai_agent_platform
-DB_USER=ai_user
-DB_PASSWORD=your-db-password
+#### Python
+
+```python
+# Streaming chat
+stream = client.chat_stream(
+    messages=[
+        {"role": "user", "content": "Tell me a story about a robot."}
+    ],
+    model="gpt-3.5-turbo"
+)
+
+for chunk in stream:
+    print(chunk, end='', flush=True)
 ```
 
-## 📊 Monitoring Your Platform
+### 3. Execute Autonomous Workflows
 
-### Service Health
-```bash
-# Check all services
-docker-compose ps
+#### JavaScript/TypeScript
 
-# View logs
-docker-compose logs -f
+```typescript
+// Execute a workflow
+const workflowResponse = await client.executeWorkflow({
+  workflow_id: 'your-workflow-id',
+  input_data: {
+    customer_query: 'I need help with my order',
+    customer_id: '12345'
+  },
+  company_id: 'your-company-id'
+});
 
-# Check specific service
-docker-compose logs -f auth-service
+console.log('Workflow executed:', workflowResponse.data.execution_id);
+console.log('Status:', workflowResponse.data.status);
+
+// Check workflow status
+const status = await client.getWorkflowStatus(workflowResponse.data.execution_id);
+console.log('Current status:', status);
 ```
 
-### Database Status
-```bash
-# Connect to database
-docker exec -it db mysql -u root -p
+#### Python
 
-# Check tables
-USE ai_agent_platform;
-SHOW TABLES;
+```python
+# Execute a workflow
+workflow_response = client.execute_workflow(
+    workflow_id="your-workflow-id",
+    input_data={
+        "customer_query": "I need help with my order",
+        "customer_id": "12345"
+    }
+)
+
+print(f"Workflow executed: {workflow_response.data.execution_id}")
+print(f"Status: {workflow_response.data.status}")
+
+# Check workflow status
+status = client.get_workflow_status(workflow_response.data.execution_id)
+print(f"Current status: {status}")
 ```
 
-### API Health Checks
-- Auth Service: http://localhost:3000/health
-- AI Service: http://localhost:8000/health
-- API Gateway: http://localhost/health
+### 4. Check Usage Statistics
 
-## 🛠️ Common Operations
+#### JavaScript/TypeScript
 
-### Restart Services
-```bash
-# Restart all services
-docker-compose restart
-
-# Restart specific service
-docker-compose restart auth-service
+```typescript
+// Get usage statistics
+const usage = await client.getUsageStats();
+console.log('Current usage:', usage.current_month_usage);
+console.log('Monthly limit:', usage.monthly_limit);
+console.log('Usage percentage:', usage.usage_percentage);
 ```
 
-### Update Platform
-```bash
-# Pull latest changes
-git pull
+#### Python
 
-# Rebuild and restart
-docker-compose down
-docker-compose up -d --build
+```python
+# Get usage statistics
+usage = client.get_usage_stats()
+print(f"Current usage: {usage.current_month_usage}")
+print(f"Monthly limit: {usage.monthly_limit}")
+print(f"Usage percentage: {usage.usage_percentage}")
 ```
 
-### Backup Database
-```bash
-# Create backup
-docker exec db mysqldump -u root -p ai_agent_platform > backup.sql
+## 🔧 Advanced Examples
 
-# Restore backup
-docker exec -i db mysql -u root -p ai_agent_platform < backup.sql
+### 1. Multi-turn Conversation
+
+```typescript
+const conversation = [
+  { role: 'system', content: 'You are a helpful customer service agent.' },
+  { role: 'user', content: 'I have a problem with my order #12345' },
+  { role: 'assistant', content: 'I can help you with that. What seems to be the issue?' },
+  { role: 'user', content: 'It hasn\'t arrived yet and it\'s been 5 days' }
+];
+
+const response = await client.chat({
+  messages: conversation,
+  model: 'gpt-4',
+  temperature: 0.7,
+  company_id: 'your-company-id'
+});
 ```
 
-### Reset Platform
-```bash
-# Stop all services
-docker-compose down
+### 2. Complex Workflow with Multiple Steps
 
-# Remove all data (WARNING: This deletes everything!)
-docker-compose down -v
+```typescript
+// Execute a complex workflow
+const workflowResponse = await client.executeWorkflow({
+  workflow_id: 'customer-support-workflow',
+  input_data: {
+    customer_query: 'My order is late',
+    customer_id: '12345',
+    order_id: 'ORD-789',
+    priority: 'high',
+    channel: 'email'
+  },
+  company_id: 'your-company-id'
+});
 
-# Start fresh
-docker-compose up -d
+// Monitor workflow progress
+let status = workflowResponse.data.status;
+while (status === 'running') {
+  await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
+  const statusResponse = await client.getWorkflowStatus(workflowResponse.data.execution_id);
+  status = statusResponse.status;
+  console.log('Workflow status:', status);
+}
+
+console.log('Workflow completed with result:', workflowResponse.data.result);
 ```
 
-## 🎨 Customization
+### 3. Error Handling
 
-### Frontend Customization
-```bash
-# Edit frontend code
-cd frontend/src
-
-# Start frontend in development mode
-cd frontend
-npm install
-npm start
+```typescript
+try {
+  const response = await client.chat({
+    messages: [{ role: 'user', content: 'Hello' }],
+    model: 'gpt-4',
+    company_id: 'your-company-id'
+  });
+} catch (error) {
+  if (error.message === 'Rate limit exceeded') {
+    console.log('You\'ve hit your rate limit. Please upgrade your plan.');
+  } else if (error.message === 'Invalid API key') {
+    console.log('Please check your API key.');
+  } else {
+    console.log('An error occurred:', error.message);
+  }
+}
 ```
 
-### Backend Customization
-```bash
-# Edit service code
-cd auth/src  # or company/src, agents/src, etc.
+## 📊 Rate Limits
 
-# Start service in development mode
-cd auth
-npm install
-npm run start:dev
-```
+| Plan | Requests/Minute | Requests/Month |
+|------|----------------|----------------|
+| Free | 10 | 1,000 |
+| Pro | 100 | 100,000 |
+| Enterprise | 1,000 | 1,000,000 |
 
-### AI Service Customization
-```bash
-# Edit AI service code
-cd ai/app
+## 🔒 Security Best Practices
 
-# Start AI service in development mode
-cd ai
-pip install -r requirements.txt
-uvicorn app.main:app --reload
-```
-
-## 🔍 Troubleshooting
-
-### Platform Won't Start
-```bash
-# Check Docker status
-docker --version
-docker-compose --version
-
-# Check available ports
-netstat -tulpn | grep :3000
-netstat -tulpn | grep :80
-
-# Check disk space
-df -h
-```
-
-### Database Issues
-```bash
-# Check database container
-docker-compose ps db
-
-# View database logs
-docker-compose logs db
-
-# Reset database
-docker-compose down -v
-docker-compose up db -d
-```
-
-### API Issues
-```bash
-# Test API endpoints
-curl http://localhost/health
-curl http://localhost:3000/health
-curl http://localhost:8000/health
-
-# Check API gateway logs
-docker-compose logs api-gateway
-```
-
-### Frontend Issues
-```bash
-# Check frontend container
-docker-compose ps frontend
-
-# View frontend logs
-docker-compose logs frontend
-
-# Rebuild frontend
-docker-compose build frontend
-docker-compose up -d frontend
-```
+1. **Never expose your API key** in client-side code
+2. **Use environment variables** to store API keys
+3. **Rotate API keys** regularly
+4. **Monitor usage** to prevent unexpected charges
+5. **Use HTTPS** for all API calls
 
 ## 📚 Next Steps
 
-### Learn More
-- **Architecture**: Read `docs/REQUIREMENT.md`
-- **Development**: Read `docs/DEVELOPMENT.md`
-- **API Documentation**: Visit service docs URLs
+1. **Explore the API Documentation**: Visit [https://docs.aiagentplatform.com](https://docs.aiagentplatform.com)
+2. **Join our Community**: [Discord](https://discord.gg/aiagentplatform)
+3. **Check out Examples**: [GitHub Examples](https://github.com/aiagentplatform/examples)
+4. **Build your first agent**: Follow our [Agent Building Guide](https://docs.aiagentplatform.com/agents)
 
-### Advanced Features
-- **Custom AI Models**: Integrate your own models
-- **Advanced Workflows**: Build complex automation
-- **External APIs**: Connect to your business systems
-- **Analytics**: Monitor and optimize performance
+## 🆘 Need Help?
 
-### Community & Support
-- **Issues**: Report bugs on GitHub
-- **Discussions**: Ask questions in GitHub Discussions
-- **Contributions**: Submit pull requests
-- **Documentation**: Help improve docs
-
-## 🎉 Congratulations!
-
-You've successfully set up the AI Agent Platform! 
-
-**What's next?**
-1. Create your first AI agent
-2. Build a simple workflow
-3. Connect to external services
-4. Monitor and optimize performance
-5. Scale for production use
-
-**Need help?**
-- Check the troubleshooting section above
-- Visit the documentation
-- Join the community discussions
-- Open an issue for bugs
+- **Documentation**: [https://docs.aiagentplatform.com](https://docs.aiagentplatform.com)
+- **Support**: [support@aiagentplatform.com](mailto:support@aiagentplatform.com)
+- **Discord**: [https://discord.gg/aiagentplatform](https://discord.gg/aiagentplatform)
+- **GitHub Issues**: [https://github.com/aiagentplatform/sdk-javascript/issues](https://github.com/aiagentplatform/sdk-javascript/issues)
 
 ---
 
-**Happy automating! 🤖✨**
+Happy building! 🚀

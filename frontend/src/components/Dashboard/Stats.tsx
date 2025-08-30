@@ -36,14 +36,17 @@ const Stats: React.FC<StatsProps> = ({ className = '' }) => {
   });
 
   useEffect(() => {
-    // Calculate stats from Redux state
+    // Calculate stats from Redux state with safe array handling
+    const safeAgents = Array.isArray(agents.agents) ? agents.agents : [];
+    const safeWorkflows = Array.isArray(workflows.workflows) ? workflows.workflows : [];
+    
     setStats({
-      totalAgents: agents.agents.length,
-      activeAgents: agents.agents.filter(agent => agent.status === 'active').length,
-      totalWorkflows: workflows.workflows.length,
-      completedWorkflows: workflows.workflows.filter(w => w.status === 'completed').length,
-      pendingWorkflows: workflows.workflows.filter(w => w.status === 'pending').length,
-      failedWorkflows: workflows.workflows.filter(w => w.status === 'failed').length,
+      totalAgents: safeAgents.length,
+      activeAgents: safeAgents.filter(agent => agent.status === 'active').length,
+      totalWorkflows: safeWorkflows.length,
+      completedWorkflows: safeWorkflows.filter(w => w.status === 'completed').length,
+      pendingWorkflows: safeWorkflows.filter(w => w.status === 'pending').length,
+      failedWorkflows: safeWorkflows.filter(w => w.status === 'failed').length,
     });
   }, [agents.agents, workflows.workflows]);
 

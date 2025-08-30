@@ -12,9 +12,9 @@ export class CreateWorkflowDto {
   @IsString()
   description?: string;
 
-  @ApiProperty({ example: 'agent-123' })
+  @ApiProperty({ example: 'company-123' })
   @IsString()
-  agent_id: string;
+  company_id: string;
 
   @ApiProperty({ enum: WorkflowStatus, default: WorkflowStatus.DRAFT })
   @IsOptional()
@@ -25,10 +25,14 @@ export class CreateWorkflowDto {
     example: [
       {
         type: 'ai_reasoning',
+        agent_id: 'agent-123',
+        name: 'AI Analysis Step',
         config: { model: 'gpt-3.5-turbo' }
       },
       {
         type: 'api_call',
+        agent_id: 'agent-456',
+        name: 'API Processing Step',
         config: { 
           method: 'POST',
           url: 'https://api.example.com/process',
@@ -58,7 +62,7 @@ export class UpdateWorkflowDto {
   @IsString()
   name?: string;
 
-  @ApiProperty({ example: 'Updated description', required: false })
+  @ApiProperty({ example: 'Updated workflow description', required: false })
   @IsOptional()
   @IsString()
   description?: string;
@@ -68,12 +72,27 @@ export class UpdateWorkflowDto {
   @IsEnum(WorkflowStatus)
   status?: WorkflowStatus;
 
-  @ApiProperty({ required: false })
+  @ApiProperty({ 
+    example: [
+      {
+        type: 'ai_reasoning',
+        agent_id: 'agent-123',
+        name: 'Updated AI Step',
+        config: { model: 'gpt-4' }
+      }
+    ],
+    required: false 
+  })
   @IsOptional()
   @IsArray()
   steps?: any[];
 
-  @ApiProperty({ required: false })
+  @ApiProperty({ 
+    example: {
+      webhook: 'https://updated.example.com/webhook'
+    },
+    required: false 
+  })
   @IsOptional()
   @IsObject()
   triggers?: any;
@@ -82,8 +101,8 @@ export class UpdateWorkflowDto {
 export class ExecuteWorkflowDto {
   @ApiProperty({ 
     example: {
-      text: 'Sample text to process',
-      parameters: { max_length: 100 }
+      text: 'Sample input data for workflow execution',
+      parameters: { key: 'value' }
     }
   })
   @IsObject()

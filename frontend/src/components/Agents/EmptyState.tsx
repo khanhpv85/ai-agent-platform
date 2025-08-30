@@ -5,11 +5,19 @@ import { Bot, Plus } from 'lucide-react';
 interface EmptyStateProps {
   searchTerm: string;
   statusFilter: string;
+  agentTypeFilter: string;
   className?: string;
+  onCreateClick?: () => void;
 }
 
-const EmptyState: React.FC<EmptyStateProps> = ({ searchTerm, statusFilter, className = '' }) => {
-  const hasFilters = searchTerm || statusFilter !== 'all';
+const EmptyState: React.FC<EmptyStateProps> = ({ 
+  searchTerm, 
+  statusFilter, 
+  agentTypeFilter,
+  className = '',
+  onCreateClick
+}) => {
+  const hasFilters = searchTerm || statusFilter !== 'all' || agentTypeFilter !== 'all';
 
   return (
     <Card className={className}>
@@ -22,8 +30,12 @@ const EmptyState: React.FC<EmptyStateProps> = ({ searchTerm, statusFilter, class
             : 'Get started by creating your first AI agent.'
           }
         </p>
-        {!hasFilters && (
-          <Button className="mt-4" leftIcon={<Plus className="h-4 w-4" />}>
+        {!hasFilters && onCreateClick && (
+          <Button 
+            className="mt-4" 
+            leftIcon={<Plus className="h-4 w-4" />}
+            onClick={onCreateClick}
+          >
             Create Agent
           </Button>
         )}

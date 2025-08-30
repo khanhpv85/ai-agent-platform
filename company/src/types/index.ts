@@ -7,3 +7,4 @@ export * from './user.types';
 export * from './agent.types';
 export * from './workflow.types';
 export * from './integration.types';
+export * from './api-key.types';

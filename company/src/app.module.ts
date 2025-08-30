@@ -5,13 +5,6 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { HttpModule } from '@nestjs/axios';
 
-// Import modules
-import { UsersModule } from '@modules/users/users.module';
-import { WorkflowsModule } from '@modules/workflows/workflows.module';
-import { IntegrationsModule } from '@modules/integrations/integrations.module';
-import { CompaniesModule } from '@modules/companies/companies.module';
-import { AgentsModule } from '@modules/agents/agents.module';
-
 // Import entities (company database only)
 import { User } from '@modules/users/entities/user.entity';
 import { Company } from '@modules/companies/entities/company.entity';
@@ -21,6 +14,15 @@ import { Workflow } from '@modules/workflows/entities/workflow.entity';
 import { WorkflowExecution } from '@modules/workflows/entities/workflow-execution.entity';
 import { KnowledgeBase } from '@modules/integrations/entities/knowledge-base.entity';
 import { Integration } from '@modules/integrations/entities/integration.entity';
+import { ApiKey } from '@modules/api-keys/entities/api-key.entity';
+
+// Import modules
+import { UsersModule } from '@modules/users/users.module';
+import { WorkflowsModule } from '@modules/workflows/workflows.module';
+import { IntegrationsModule } from '@modules/integrations/integrations.module';
+import { CompaniesModule } from '@modules/companies/companies.module';
+import { AgentsModule } from '@modules/agents/agents.module';
+import { ApiKeysModule } from '@modules/api-keys/api-keys.module';
 
 // Import strategies and services
 import { JwtStrategy } from './strategies/jwt.strategy';
@@ -49,7 +51,8 @@ import { QueueWorkerService } from '@services/queue-worker.service';
         Workflow, 
         WorkflowExecution, 
         KnowledgeBase, 
-        Integration
+        Integration,
+        ApiKey
       ],
       synchronize: false, // Set to false in production
       logging: process.env.NODE_ENV === 'development',
@@ -66,6 +69,7 @@ import { QueueWorkerService } from '@services/queue-worker.service';
     IntegrationsModule,
     CompaniesModule,
     AgentsModule,
+    ApiKeysModule,
   ],
   providers: [JwtStrategy, AuthClientService, QueueOAuthClientService, QueueWorkerService],
   exports: [AuthClientService, QueueOAuthClientService],

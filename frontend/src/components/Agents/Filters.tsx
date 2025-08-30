@@ -5,16 +5,20 @@ import { Search, Filter } from 'lucide-react';
 interface FiltersProps {
   searchTerm: string;
   statusFilter: string;
+  agentTypeFilter: string;
   onSearchChange: (value: string) => void;
   onStatusChange: (value: string) => void;
+  onAgentTypeChange: (value: string) => void;
   className?: string;
 }
 
 const Filters: React.FC<FiltersProps> = ({ 
   searchTerm, 
-  statusFilter, 
+  statusFilter,
+  agentTypeFilter,
   onSearchChange, 
-  onStatusChange, 
+  onStatusChange,
+  onAgentTypeChange,
   className = '' 
 }) => {
   return (
@@ -42,8 +46,18 @@ const Filters: React.FC<FiltersProps> = ({
             >
               <option value="all">All Status</option>
               <option value="active">Active</option>
-              <option value="idle">Idle</option>
-              <option value="error">Error</option>
+              <option value="inactive">Inactive</option>
+              <option value="draft">Draft</option>
+            </select>
+            <select
+              value={agentTypeFilter}
+              onChange={(e) => onAgentTypeChange(e.target.value)}
+              className="border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            >
+              <option value="all">All Types</option>
+              <option value="workflow">Workflow</option>
+              <option value="chatbot">Chatbot</option>
+              <option value="assistant">Assistant</option>
             </select>
           </div>
         </div>

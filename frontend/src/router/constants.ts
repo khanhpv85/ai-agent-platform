@@ -11,6 +11,7 @@ export const ROUTES = {
   QUEUE: '/queue',
   SETTINGS: '/settings',
   COMPANIES: '/companies',
+  USERS: '/users',
   ANALYTICS: '/analytics',
   INTEGRATIONS: '/integrations',
 } as const;
@@ -25,6 +26,7 @@ export const ROUTE_NAMES = {
   [ROUTES.QUEUE]: 'Queue',
   [ROUTES.SETTINGS]: 'Settings',
   [ROUTES.COMPANIES]: 'Companies',
+  [ROUTES.USERS]: 'Users',
   [ROUTES.ANALYTICS]: 'Analytics',
   [ROUTES.INTEGRATIONS]: 'Integrations',
 } as const;

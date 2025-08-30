@@ -1,12 +1,20 @@
 // Workflow-related interfaces and types
 
+export interface WorkflowStep {
+  type: string;
+  agent_id: string;
+  name?: string;
+  config?: any;
+  order?: number;
+}
+
 export interface Workflow {
   id: string;
   name: string;
   description?: string;
-  agent_id: string;
+  company_id: string;
   status: string;
-  steps: any[];
+  steps: WorkflowStep[];
   triggers?: any;
   created_by: string;
   created_at: string;
@@ -36,9 +44,9 @@ export interface WorkflowsState {
 export interface CreateWorkflowData {
   name: string;
   description?: string;
-  agent_id: string;
+  company_id: string;
   status?: string;
-  steps: any[];
+  steps: WorkflowStep[];
   triggers?: any;
 }
 
@@ -46,7 +54,7 @@ export interface UpdateWorkflowData {
   name?: string;
   description?: string;
   status?: string;
-  steps?: any[];
+  steps?: WorkflowStep[];
   triggers?: any;
 }
 

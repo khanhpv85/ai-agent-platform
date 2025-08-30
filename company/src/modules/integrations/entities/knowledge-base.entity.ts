@@ -1,6 +1,13 @@
 import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { Company } from '@modules/companies/entities/company.entity';
-import { SourceType } from '../../../types/integration.types';
+
+export enum SourceType {
+  DOCUMENT = 'document',
+  DATABASE = 'database',
+  API = 'api',
+  WEBSITE = 'website',
+  FILE = 'file'
+}
 
 @Entity('knowledge_bases')
 export class KnowledgeBase {
@@ -19,10 +26,11 @@ export class KnowledgeBase {
   @Column({
     type: 'enum',
     enum: SourceType,
+    default: SourceType.DOCUMENT,
   })
   source_type: SourceType;
 
-  @Column('json')
+  @Column('json', { nullable: true })
   source_config: any;
 
   @Column('boolean', { default: true })

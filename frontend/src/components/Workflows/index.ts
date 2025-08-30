@@ -1,5 +1,12 @@
 export { default as Header } from './Header';
-export { default as Stats } from './Stats';
 export { default as Filters } from './Filters';
 export { default as WorkflowCard } from './WorkflowCard';
 export { default as EmptyState } from './EmptyState';
+export { default as Stats } from './Stats';
+export { default as WorkflowSelector } from './WorkflowSelector';
+export { default as WorkflowCanvas } from './WorkflowCanvas';
+export { default as WorkflowNode } from './WorkflowNode';
+export { default as ConnectionLine } from './ConnectionLine';
+export { default as CreateWorkflowModal } from './CreateWorkflowModal';
+export { default as AgentSelectionModal } from './AgentSelectionModal';
+export { default as DeleteWorkflowModal } from './DeleteWorkflowModal';

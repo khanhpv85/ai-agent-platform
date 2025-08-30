@@ -14,7 +14,11 @@ const authInitialState = {
 
 export const authSlice = createSlice({
   name: 'auth',
-  initialState: authInitialState,
+  initialState: {
+    ...authInitialState,
+    users: [],
+    currentUser: null,
+  },
   reducers: {
     setUser: (state, action) => {
       state.user = action.payload;
@@ -33,6 +37,8 @@ export const authSlice = createSlice({
       state.expiresIn = null;
       state.refreshExpiresIn = null;
       state.isAuthenticated = false;
+      state.users = [];
+      state.currentUser = null;
     },
     setLoading: (state, action) => {
       state.loading = action.payload;
@@ -43,6 +49,129 @@ export const authSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
+    setAuthLoading: (state, action) => {
+      state.loading = action.payload;
+    },
+    setAuthError: (state, action) => {
+      state.error = action.payload;
+    },
+    clearAuthError: (state) => {
+      state.error = null;
+    },
+  },
+  extraReducers: (builder) => {
+    // Fetch users
+    builder
+      .addCase('auth/fetchUsers/pending', (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase('auth/fetchUsers/fulfilled', (state, action) => {
+        state.loading = false;
+        state.users = action.payload.users || action.payload;
+      })
+      .addCase('auth/fetchUsers/rejected', (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      // Create user
+      .addCase('auth/createUser/pending', (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase('auth/createUser/fulfilled', (state, action) => {
+        state.loading = false;
+        state.users.push(action.payload);
+      })
+      .addCase('auth/createUser/rejected', (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      // Update user
+      .addCase('auth/updateUser/pending', (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase('auth/updateUser/fulfilled', (state, action) => {
+        state.loading = false;
+        const index = state.users.findIndex(user => user.id === action.payload.id);
+        if (index !== -1) {
+          state.users[index] = action.payload;
+        }
+      })
+      .addCase('auth/updateUser/rejected', (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      // Delete user
+      .addCase('auth/deleteUser/pending', (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase('auth/deleteUser/fulfilled', (state, action) => {
+        state.loading = false;
+        state.users = state.users.filter(user => user.id !== action.payload);
+      })
+      .addCase('auth/deleteUser/rejected', (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      // Activate user
+      .addCase('auth/activateUser/pending', (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase('auth/activateUser/fulfilled', (state, action) => {
+        state.loading = false;
+        const index = state.users.findIndex(user => user.id === action.payload.id);
+        if (index !== -1) {
+          state.users[index] = action.payload;
+        }
+      })
+      .addCase('auth/activateUser/rejected', (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      // Deactivate user
+      .addCase('auth/deactivateUser/pending', (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase('auth/deactivateUser/fulfilled', (state, action) => {
+        state.loading = false;
+        const index = state.users.findIndex(user => user.id === action.payload.id);
+        if (index !== -1) {
+          state.users[index] = action.payload;
+        }
+      })
+      .addCase('auth/deactivateUser/rejected', (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      // Resend verification
+      .addCase('auth/resendUserVerification/pending', (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase('auth/resendUserVerification/fulfilled', (state) => {
+        state.loading = false;
+      })
+      .addCase('auth/resendUserVerification/rejected', (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      // Reset password
+      .addCase('auth/resetUserPassword/pending', (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase('auth/resetUserPassword/fulfilled', (state) => {
+        state.loading = false;
+      })
+      .addCase('auth/resetUserPassword/rejected', (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      });
   },
 });
 
@@ -50,6 +179,7 @@ export const authSlice = createSlice({
 const companyInitialState = {
   companies: [],
   currentCompany: null,
+  pagination: null,
   loading: false,
   error: null,
 };
@@ -60,6 +190,9 @@ export const companySlice = createSlice({
   reducers: {
     setCompanies: (state, action) => {
       state.companies = action.payload;
+    },
+    setPagination: (state, action) => {
+      state.pagination = action.payload;
     },
     setCurrentCompany: (state, action) => {
       state.currentCompany = action.payload;
@@ -191,6 +324,7 @@ export const {
   addCompany, 
   updateCompany, 
   removeCompany,
+  setPagination,
   setLoading: setCompanyLoading, 
   setError: setCompanyError, 
   clearError: clearCompanyError 
@@ -218,3 +352,5 @@ export const {
   setError: setWorkflowsError, 
   clearError: clearWorkflowsError 
 } = workflowsSlice.actions;
+
+

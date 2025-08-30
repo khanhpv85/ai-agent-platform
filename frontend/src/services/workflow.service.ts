@@ -23,12 +23,7 @@ import {
 export const workflowAPI = {
   fetchWorkflows: async (companyId: string): Promise<Workflow[]> => {
     const response = await companyClient.get(`/workflows/company/${companyId}`);
-    return response.data;
-  },
-
-  fetchAgentWorkflows: async (agentId: string): Promise<Workflow[]> => {
-    const response = await companyClient.get(`/workflows/agent/${agentId}`);
-    return response.data;
+    return response.data || [];
   },
 
   createWorkflow: async (workflowData: CreateWorkflowData): Promise<Workflow> => {
@@ -50,167 +45,114 @@ export const workflowAPI = {
     return response.data;
   },
 
+  fetchWorkflowById: async (workflowId: string): Promise<Workflow> => {
+    const response = await companyClient.get(`/workflows/${workflowId}`);
+    return response.data;
+  },
+
   fetchWorkflowExecutions: async (workflowId: string): Promise<WorkflowExecution[]> => {
     const response = await companyClient.get(`/workflows/${workflowId}/executions`);
-    return response.data;
+    return response.data || [];
   }
 };
 
-// Async thunks
+// Redux Thunks
 export const fetchWorkflows = createAsyncThunk(
   'workflows/fetchWorkflows',
-  async (companyId: string, { dispatch, rejectWithValue }: any) => {
+  async (companyId: string, { dispatch }) => {
+    dispatch(setWorkflowsLoading(true));
     try {
-      dispatch(setWorkflowsLoading(true));
-      dispatch(clearWorkflowsError());
-      
-      const response = await workflowAPI.fetchWorkflows(companyId);
-      
-      // Update store
-      dispatch(setWorkflows(response));
-      
-      return response;
+      const workflows = await workflowAPI.fetchWorkflows(companyId);
+      dispatch(setWorkflows(workflows));
+      return workflows;
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || 'Failed to fetch workflows';
-      dispatch(setWorkflowsError(errorMessage));
-      return rejectWithValue(errorMessage);
+      dispatch(setWorkflowsError(error.message || 'Failed to fetch workflows'));
+      throw error;
     } finally {
       dispatch(setWorkflowsLoading(false));
     }
   }
 );
 
-export const fetchAgentWorkflows = createAsyncThunk(
-  'workflows/fetchAgentWorkflows',
-  async (agentId: string, { dispatch, rejectWithValue }: any) => {
+export const fetchWorkflowById = createAsyncThunk(
+  'workflows/fetchWorkflowById',
+  async (workflowId: string, { dispatch }) => {
     try {
-      dispatch(setWorkflowsLoading(true));
-      dispatch(clearWorkflowsError());
-      
-      const response = await workflowAPI.fetchAgentWorkflows(agentId);
-      
-      // Update store
-      dispatch(setWorkflows(response));
-      
-      return response;
+      const workflow = await workflowAPI.fetchWorkflowById(workflowId);
+      dispatch(setCurrentWorkflow(workflow));
+      return workflow;
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || 'Failed to fetch workflows';
-      dispatch(setWorkflowsError(errorMessage));
-      return rejectWithValue(errorMessage);
-    } finally {
-      dispatch(setWorkflowsLoading(false));
+      dispatch(setWorkflowsError(error.message || 'Failed to fetch workflow'));
+      throw error;
     }
   }
 );
 
 export const createWorkflow = createAsyncThunk(
   'workflows/createWorkflow',
-  async (workflowData: CreateWorkflowData, { dispatch, rejectWithValue }: any) => {
+  async (workflowData: CreateWorkflowData, { dispatch }) => {
     try {
-      dispatch(setWorkflowsLoading(true));
-      dispatch(clearWorkflowsError());
-      
-      const response = await workflowAPI.createWorkflow(workflowData);
-      
-      // Update store
-      dispatch(addWorkflow(response));
-      
-      return response;
+      const workflow = await workflowAPI.createWorkflow(workflowData);
+      dispatch(addWorkflow(workflow));
+      return workflow;
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || 'Failed to create workflow';
-      dispatch(setWorkflowsError(errorMessage));
-      return rejectWithValue(errorMessage);
-    } finally {
-      dispatch(setWorkflowsLoading(false));
+      dispatch(setWorkflowsError(error.message || 'Failed to create workflow'));
+      throw error;
     }
   }
 );
 
 export const updateWorkflow = createAsyncThunk(
   'workflows/updateWorkflow',
-  async ({ id, data }: { id: string; data: UpdateWorkflowData }, { dispatch, rejectWithValue }: any) => {
+  async ({ id, data }: { id: string; data: UpdateWorkflowData }, { dispatch }) => {
     try {
-      dispatch(setWorkflowsLoading(true));
-      dispatch(clearWorkflowsError());
-      
-      const response = await workflowAPI.updateWorkflow(id, data);
-      
-      // Update store
-      dispatch(updateWorkflowAction(response));
-      
-      return response;
+      const workflow = await workflowAPI.updateWorkflow(id, data);
+      dispatch(updateWorkflowAction(workflow));
+      return workflow;
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || 'Failed to update workflow';
-      dispatch(setWorkflowsError(errorMessage));
-      return rejectWithValue(errorMessage);
-    } finally {
-      dispatch(setWorkflowsLoading(false));
+      dispatch(setWorkflowsError(error.message || 'Failed to update workflow'));
+      throw error;
     }
   }
 );
 
 export const deleteWorkflow = createAsyncThunk(
   'workflows/deleteWorkflow',
-  async (id: string, { dispatch, rejectWithValue }: any) => {
+  async (workflowId: string, { dispatch }) => {
     try {
-      dispatch(setWorkflowsLoading(true));
-      dispatch(clearWorkflowsError());
-      
-      await workflowAPI.deleteWorkflow(id);
-      
-      // Update store
-      dispatch(removeWorkflow(id));
-      
-      return id;
+      await workflowAPI.deleteWorkflow(workflowId);
+      dispatch(removeWorkflow(workflowId));
+      return workflowId;
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || 'Failed to delete workflow';
-      dispatch(setWorkflowsError(errorMessage));
-      return rejectWithValue(errorMessage);
-    } finally {
-      dispatch(setWorkflowsLoading(false));
+      dispatch(setWorkflowsError(error.message || 'Failed to delete workflow'));
+      throw error;
     }
   }
 );
 
 export const executeWorkflow = createAsyncThunk(
   'workflows/executeWorkflow',
-  async ({ id, inputData }: { id: string; inputData: ExecuteWorkflowData }, { dispatch, rejectWithValue }: any) => {
+  async ({ id, inputData }: { id: string; inputData: ExecuteWorkflowData }, { dispatch }) => {
     try {
-      dispatch(setWorkflowsLoading(true));
-      dispatch(clearWorkflowsError());
-      
-      const response = await workflowAPI.executeWorkflow(id, inputData);
-      
-      return response;
+      const result = await workflowAPI.executeWorkflow(id, inputData);
+      return result;
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || 'Failed to execute workflow';
-      dispatch(setWorkflowsError(errorMessage));
-      return rejectWithValue(errorMessage);
-    } finally {
-      dispatch(setWorkflowsLoading(false));
+      dispatch(setWorkflowsError(error.message || 'Failed to execute workflow'));
+      throw error;
     }
   }
 );
 
 export const fetchWorkflowExecutions = createAsyncThunk(
   'workflows/fetchWorkflowExecutions',
-  async (workflowId: string, { dispatch, rejectWithValue }: any) => {
+  async (workflowId: string, { dispatch }) => {
     try {
-      dispatch(setWorkflowsLoading(true));
-      dispatch(clearWorkflowsError());
-      
-      const response = await workflowAPI.fetchWorkflowExecutions(workflowId);
-      
-      // Update store
-      dispatch(setExecutions(response));
-      
-      return response;
+      const executions = await workflowAPI.fetchWorkflowExecutions(workflowId);
+      dispatch(setExecutions(executions));
+      return executions;
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || 'Failed to fetch workflow executions';
-      dispatch(setWorkflowsError(errorMessage));
-      return rejectWithValue(errorMessage);
-    } finally {
-      dispatch(setWorkflowsLoading(false));
+      dispatch(setWorkflowsError(error.message || 'Failed to fetch workflow executions'));
+      throw error;
     }
   }
 );

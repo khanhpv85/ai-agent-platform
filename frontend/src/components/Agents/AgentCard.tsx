@@ -10,26 +10,40 @@ import {
   Zap,
   Clock,
   AlertCircle,
-  Settings
+  Settings,
+  User
 } from 'lucide-react';
 import { Agent } from '@interfaces/agent.interface';
 
 interface AgentCardProps {
   agent: Agent;
   className?: string;
+  onEdit?: (agent: Agent) => void;
+  onDelete?: (agent: Agent) => void;
+  onConfigure?: (agent: Agent) => void;
+  onStart?: (agent: Agent) => void;
+  onPause?: (agent: Agent) => void;
 }
 
-const AgentCard: React.FC<AgentCardProps> = ({ agent, className = '' }) => {
+const AgentCard: React.FC<AgentCardProps> = ({ 
+  agent, 
+  className = '',
+  onEdit,
+  onDelete,
+  onConfigure,
+  onStart,
+  onPause
+}) => {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'active':
         return <Zap className="h-4 w-4 text-green-500" />;
-      case 'idle':
-        return <Clock className="h-4 w-4 text-yellow-500" />;
-      case 'error':
-        return <AlertCircle className="h-4 w-4 text-red-500" />;
-      default:
+      case 'inactive':
+        return <Pause className="h-4 w-4 text-yellow-500" />;
+      case 'draft':
         return <Settings className="h-4 w-4 text-gray-500" />;
+      default:
+        return <Clock className="h-4 w-4 text-blue-500" />;
     }
   };
 
@@ -37,12 +51,25 @@ const AgentCard: React.FC<AgentCardProps> = ({ agent, className = '' }) => {
     switch (status) {
       case 'active':
         return <Badge variant="success" icon={getStatusIcon(status)}>Active</Badge>;
-      case 'idle':
-        return <Badge variant="warning" icon={getStatusIcon(status)}>Idle</Badge>;
-      case 'error':
-        return <Badge variant="error" icon={getStatusIcon(status)}>Error</Badge>;
+      case 'inactive':
+        return <Badge variant="warning" icon={getStatusIcon(status)}>Inactive</Badge>;
+      case 'draft':
+        return <Badge variant="default" icon={getStatusIcon(status)}>Draft</Badge>;
       default:
         return <Badge variant="default" icon={getStatusIcon(status)}>{status}</Badge>;
+    }
+  };
+
+  const getAgentTypeLabel = (type: string) => {
+    switch (type) {
+      case 'workflow':
+        return 'Workflow Agent';
+      case 'chatbot':
+        return 'Chatbot';
+      case 'assistant':
+        return 'Assistant';
+      default:
+        return 'Custom Agent';
     }
   };
 
@@ -57,7 +84,7 @@ const AgentCard: React.FC<AgentCardProps> = ({ agent, className = '' }) => {
             <div>
               <CardTitle className="text-lg">{agent.name}</CardTitle>
               <CardDescription className="text-sm">
-                {agent.agent_type || 'Custom Agent'}
+                {getAgentTypeLabel(agent.agent_type)}
               </CardDescription>
             </div>
           </div>
@@ -72,26 +99,75 @@ const AgentCard: React.FC<AgentCardProps> = ({ agent, className = '' }) => {
           {agent.description || 'No description available'}
         </p>
         
-        <div className="flex items-center justify-between">
-          {getStatusBadge(agent.status)}
-          <span className="text-xs text-gray-500">
-            Created {new Date(agent.created_at).toLocaleDateString()}
-          </span>
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            {getStatusBadge(agent.status)}
+            <span className="text-xs text-gray-500">
+              Created {new Date(agent.created_at).toLocaleDateString()}
+            </span>
+          </div>
+          
+          <div className="flex items-center gap-2 text-xs text-gray-500">
+            <User className="h-3 w-3" />
+            <span>Created by {agent.created_by}</span>
+          </div>
         </div>
         
         <div className="flex items-center gap-2 pt-2">
-          <Button size="sm" variant="outline" leftIcon={<Play className="h-3 w-3" />}>
-            Start
-          </Button>
-          <Button size="sm" variant="outline" leftIcon={<Pause className="h-3 w-3" />}>
-            Pause
-          </Button>
-          <Button size="sm" variant="outline" leftIcon={<Edit className="h-3 w-3" />}>
-            Edit
-          </Button>
-          <Button size="sm" variant="destructive" leftIcon={<Trash2 className="h-3 w-3" />}>
-            Delete
-          </Button>
+          {agent.status === 'inactive' && onStart && (
+            <Button 
+              size="sm" 
+              variant="outline" 
+              leftIcon={<Play className="h-3 w-3" />}
+              onClick={() => onStart(agent)}
+            >
+              Start
+            </Button>
+          )}
+          
+          {agent.status === 'active' && onPause && (
+            <Button 
+              size="sm" 
+              variant="outline" 
+              leftIcon={<Pause className="h-3 w-3" />}
+              onClick={() => onPause(agent)}
+            >
+              Pause
+            </Button>
+          )}
+          
+          {onConfigure && (
+            <Button 
+              size="sm" 
+              variant="outline" 
+              leftIcon={<Settings className="h-3 w-3" />}
+              onClick={() => onConfigure(agent)}
+            >
+              Configure
+            </Button>
+          )}
+          
+          {onEdit && (
+            <Button 
+              size="sm" 
+              variant="outline" 
+              leftIcon={<Edit className="h-3 w-3" />}
+              onClick={() => onEdit(agent)}
+            >
+              Edit
+            </Button>
+          )}
+          
+          {onDelete && (
+            <Button 
+              size="sm" 
+              variant="destructive" 
+              leftIcon={<Trash2 className="h-3 w-3" />}
+              onClick={() => onDelete(agent)}
+            >
+              Delete
+            </Button>
+          )}
         </div>
       </CardContent>
     </Card>

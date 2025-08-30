@@ -1,5 +1,6 @@
 import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
 import { UserCompany } from '@modules/users/entities/user-company.entity';
+import { ApiKey } from '@modules/api-keys/entities/api-key.entity';
 import { SubscriptionPlan } from '@types';
 
 @Entity('companies')
@@ -31,4 +32,7 @@ export class Company {
 
   @OneToMany(() => UserCompany, userCompany => userCompany.company)
   userCompanies: UserCompany[];
+
+  @OneToMany(() => ApiKey, apiKey => apiKey.company)
+  apiKeys: ApiKey[];
 }

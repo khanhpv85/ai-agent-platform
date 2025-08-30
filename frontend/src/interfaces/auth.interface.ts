@@ -124,3 +124,29 @@ export interface SessionsResponse {
     pages: number;
   };
 }
+
+// User management interfaces
+export interface CreateUserRequest {
+  email: string;
+  password: string;
+  first_name: string;
+  last_name: string;
+  role: string;
+  company_id?: string;
+}
+
+export interface UpdateUserRequest extends Partial<CreateUserRequest> {
+  id: string;
+  is_active?: boolean;
+  email_verified?: boolean;
+}
+
+export interface UsersResponse {
+  users: User[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    pages: number;
+  };
+}

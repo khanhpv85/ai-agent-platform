@@ -5,7 +5,8 @@ import {
   Bell, 
   Palette, 
   Zap, 
-  Settings as SettingsIcon 
+  Settings as SettingsIcon,
+  Key
 } from 'lucide-react';
 
 interface Tab {
@@ -27,6 +28,7 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, onTabChange, c
     { id: 'notifications', name: 'Notifications', icon: Bell },
     { id: 'appearance', name: 'Appearance', icon: Palette },
     { id: 'integrations', name: 'Integrations', icon: Zap },
+    { id: 'api-keys', name: 'API Keys', icon: Key },
     { id: 'system', name: 'System', icon: SettingsIcon },
   ];
 

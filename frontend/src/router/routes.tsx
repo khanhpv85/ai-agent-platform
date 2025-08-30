@@ -2,15 +2,20 @@ import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import ProtectedRoute from './protectedRoute';
 import { Layout } from '@components/Layout';
-import Login from '@pages/Login';
-import Register from '@pages/Register';
-import Dashboard from '@pages/Dashboard';
-import Agents from '@pages/Agents';
-import Workflows from '@pages/Workflows';
-import Queue from '@pages/Queue';
-import Settings from '@pages/Settings';
-import Companies from '@pages/Companies';
-import NotFound from '@pages/NotFound';
+
+import { 
+  NotFound,
+  Dashboard,
+  Agents,
+  Workflows,
+  Queue,
+  Settings,
+  Companies,
+  Users,
+  Integrations,
+  Login,
+  Register,
+} from '@pages';
 import { ROUTES } from './constants';
 
 /**
@@ -46,6 +51,8 @@ export const AppRoutes: React.FC = () => {
         <Route path="queue" element={<Queue />} />
         <Route path="settings" element={<Settings />} />
         <Route path="companies" element={<Companies />} />
+        <Route path="users" element={<Users />} />
+        <Route path="integrations" element={<Integrations />} />
         
         {/* Catch-all route for unmatched paths */}
         <Route path="*" element={<NotFound />} />

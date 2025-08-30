@@ -1,0 +1,11 @@
+export { default as NotFound } from './NotFound';
+export { default as Dashboard } from './Dashboard';
+export { default as Agents } from './Agents';
+export { default as Workflows } from './Workflows';
+export { default as Queue } from './Queue';
+export { default as Settings } from './Settings';
+export { default as Companies } from './Companies';
+export { default as Users } from './Users';
+export { default as Integrations } from './Integrations';
+export { default as Login } from './Login';
+export { default as Register } from './Register';

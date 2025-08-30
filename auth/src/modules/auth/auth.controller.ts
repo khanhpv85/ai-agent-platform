@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Put, Delete, Body, UseGuards, Request, Param, Query } from '@nestjs/common';
+import { Controller, Post, Get, Put, Delete, Patch, Body, UseGuards, Request, Param, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 
@@ -390,6 +390,27 @@ export class AuthController {
     return this.authService.changePassword(req.user.id, changePasswordDto);
   }
 
+  @Get('users')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get users (Admin only)' })
+  @ApiResponse({ status: 200, description: 'Users retrieved successfully', type: UserSchema })
+  @ApiResponse({ status: 401, description: 'Unauthorized', type: AuthErrorResponseSchema })
+  async getUsers(@Request() req, @Query() query: any) {
+    return this.authService.getUsers(query, req.user);
+  }
+
+  @Get('users/:id')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get user by ID (Admin only)' })
+  @ApiResponse({ status: 200, description: 'User retrieved successfully', type: UserSchema })
+  @ApiResponse({ status: 401, description: 'Unauthorized', type: AuthErrorResponseSchema })
+  @ApiResponse({ status: 404, description: 'User not found', type: NotFoundErrorResponseSchema })
+  async getUserById(@Request() req, @Param('id') id: string) {
+    return this.authService.getUserById(id, req.user);
+  }
+
   @Post('users')
   @UseGuards(AuthGuard('jwt'))
   @ApiBearerAuth()
@@ -410,5 +431,60 @@ export class AuthController {
   @ApiResponse({ status: 404, description: 'User not found', type: NotFoundErrorResponseSchema })
   async updateUser(@Request() req, @Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.authService.updateUser(id, updateUserDto, req.user);
+  }
+
+  @Delete('users/:id')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Delete user (Admin only)' })
+  @ApiResponse({ status: 200, description: 'User deleted successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized', type: AuthErrorResponseSchema })
+  @ApiResponse({ status: 404, description: 'User not found', type: NotFoundErrorResponseSchema })
+  async deleteUser(@Request() req, @Param('id') id: string) {
+    return this.authService.deleteUser(id, req.user);
+  }
+
+  @Patch('users/:id/activate')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Activate user (Admin only)' })
+  @ApiResponse({ status: 200, description: 'User activated successfully', type: UserSchema })
+  @ApiResponse({ status: 401, description: 'Unauthorized', type: AuthErrorResponseSchema })
+  @ApiResponse({ status: 404, description: 'User not found', type: NotFoundErrorResponseSchema })
+  async activateUser(@Request() req, @Param('id') id: string) {
+    return this.authService.activateUser(id, req.user);
+  }
+
+  @Patch('users/:id/deactivate')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Deactivate user (Admin only)' })
+  @ApiResponse({ status: 200, description: 'User deactivated successfully', type: UserSchema })
+  @ApiResponse({ status: 401, description: 'Unauthorized', type: AuthErrorResponseSchema })
+  @ApiResponse({ status: 404, description: 'User not found', type: NotFoundErrorResponseSchema })
+  async deactivateUser(@Request() req, @Param('id') id: string) {
+    return this.authService.deactivateUser(id, req.user);
+  }
+
+  @Post('users/:id/resend-verification')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Resend verification email (Admin only)' })
+  @ApiResponse({ status: 200, description: 'Verification email sent successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized', type: AuthErrorResponseSchema })
+  @ApiResponse({ status: 404, description: 'User not found', type: NotFoundErrorResponseSchema })
+  async resendUserVerification(@Request() req, @Param('id') id: string) {
+    return this.authService.resendUserVerification(id, req.user);
+  }
+
+  @Post('users/:id/reset-password')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Reset user password (Admin only)' })
+  @ApiResponse({ status: 200, description: 'Password reset email sent successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized', type: AuthErrorResponseSchema })
+  @ApiResponse({ status: 404, description: 'User not found', type: NotFoundErrorResponseSchema })
+  async resetUserPassword(@Request() req, @Param('id') id: string) {
+    return this.authService.resetUserPassword(id, req.user);
   }
 }

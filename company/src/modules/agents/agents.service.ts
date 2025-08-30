@@ -5,7 +5,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { Agent } from './entities/agent.entity';
 import { Company } from '@modules/companies/entities/company.entity';
 import { User } from '@modules/users/entities/user.entity';
-import { CreateAgentDto, UpdateAgentDto } from './dto/agents.dto';
+import { UserCompany } from '@modules/users/entities/user-company.entity';
+import { CreateAgentDto, UpdateAgentDto, UpdateLLMConfigDto, UpdateKnowledgeBaseConfigDto } from './dto/agents.dto';
 import { AgentStatus, AgentType } from '@types';
 
 @Injectable()
@@ -17,6 +18,8 @@ export class AgentsService {
     private companyRepository: Repository<Company>,
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    @InjectRepository(UserCompany)
+    private userCompanyRepository: Repository<UserCompany>,
   ) {}
 
   async getCompanyAgents(companyId: string, userId: string) {
@@ -139,6 +142,82 @@ export class AgentsService {
       company_id: agent.company_id,
       created_at: agent.created_at,
       updated_at: agent.updated_at,
+    };
+  }
+
+  async updateLLMConfiguration(agentId: string, llmConfig: UpdateLLMConfigDto, userId: string) {
+    const agent = await this.agentRepository.findOne({ where: { id: agentId }, relations: ['company'] });
+    if (!agent) {
+      throw new NotFoundException('Agent not found');
+    }
+
+    // Check if user has access to this agent's company
+    const userCompany = await this.userCompanyRepository.findOne({
+      where: { user_id: userId, company_id: agent.company_id }
+    });
+    if (!userCompany) {
+      throw new ForbiddenException('Access denied');
+    }
+
+    // Get current configuration or initialize empty object
+    const currentConfig = agent.configuration || {};
+    
+    // Update only the LLM configuration section
+    const updatedConfig = {
+      ...currentConfig,
+      llm: { ...currentConfig.llm, ...llmConfig }
+    };
+
+    agent.configuration = updatedConfig;
+    await this.agentRepository.save(agent);
+
+    return {
+      id: agent.id,
+      name: agent.name,
+      description: agent.description,
+      status: agent.status,
+      agent_type: agent.agent_type,
+      configuration: agent.configuration,
+      created_at: agent.created_at,
+      updated_at: agent.updated_at
+    };
+  }
+
+  async updateKnowledgeBaseConfiguration(agentId: string, knowledgeBaseConfig: UpdateKnowledgeBaseConfigDto, userId: string) {
+    const agent = await this.agentRepository.findOne({ where: { id: agentId }, relations: ['company'] });
+    if (!agent) {
+      throw new NotFoundException('Agent not found');
+    }
+
+    // Check if user has access to this agent's company
+    const userCompany = await this.userCompanyRepository.findOne({
+      where: { user_id: userId, company_id: agent.company_id }
+    });
+    if (!userCompany) {
+      throw new ForbiddenException('Access denied');
+    }
+
+    // Get current configuration or initialize empty object
+    const currentConfig = agent.configuration || {};
+    
+    // Update only the knowledge base configuration section
+    const updatedConfig = {
+      ...currentConfig,
+      knowledge_bases: knowledgeBaseConfig.knowledge_bases
+    };
+
+    agent.configuration = updatedConfig;
+    await this.agentRepository.save(agent);
+
+    return {
+      id: agent.id,
+      name: agent.name,
+      description: agent.description,
+      status: agent.status,
+      agent_type: agent.agent_type,
+      configuration: agent.configuration,
+      created_at: agent.created_at,
+      updated_at: agent.updated_at
     };
   }
 

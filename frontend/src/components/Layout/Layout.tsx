@@ -18,9 +18,9 @@ const Layout: React.FC = () => {
       />
 
       {/* Main content */}
-      <div className="flex flex-col flex-1 transition-all duration-300">
+      <div className="flex flex-col flex-1 transition-all duration-300 overflow-x-hidden">
         <Header onMenuClick={() => setSidebarOpen(true)} />
-        <main className="flex-1 p-3">
+        <main className="flex-1 p-3 overflow-x-hidden">
           <Outlet />
         </main>
       </div>

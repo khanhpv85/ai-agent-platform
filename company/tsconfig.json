@@ -31,7 +31,9 @@
       "@interfaces": ["src/interfaces"],
       "@interfaces/*": ["src/interfaces/*"],
       "@types": ["src/types"],
-      "@types/*": ["src/types/*"]
+      "@types/*": ["src/types/*"],
+      "@schemas": ["src/schemas"],
+      "@schemas/*": ["src/schemas/*"],
     }
   }
 }
